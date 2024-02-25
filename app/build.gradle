@@ -33,7 +33,7 @@ repositories {
     repositories {
         google()
         mavenCentral()
-        jcenter()
+        jcenter() // TODO com.roughike:bottom-bar comes from jcenter, migrate to BottomNavigationView
     }
 }
 
