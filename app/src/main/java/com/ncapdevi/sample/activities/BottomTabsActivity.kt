@@ -74,9 +74,9 @@ class BottomTabsActivity : AppCompatActivity(), BaseFragment.FragmentNavigation,
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        fragNavController.onSaveInstanceState(outState!!)
+        fragNavController.onSaveInstanceState(outState)
 
     }
 

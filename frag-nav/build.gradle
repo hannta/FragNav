@@ -1,56 +1,31 @@
 plugins {
-    id "com.jfrog.bintray" version "1.8.4"
-    id "com.github.dcendents.android-maven" version "2.1"
-    id 'com.github.kt3k.coveralls' version '2.8.2'
+    id 'com.github.kt3k.coveralls' version '2.12.2'
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'jacoco'
 apply plugin: "de.mannodermaus.android-junit5"
-apply plugin: "com.vanniktech.android.junit.jacoco"
 
-ext {
-    libraryVersionCode = 30
-    libraryVersionName = '3.3.0'
-
-    //Bintray and Maven
-    bintrayRepo = 'maven'
-    bintrayName = 'frag-nav'
-
-    publishedGroupId = 'com.ncapdevi'
-    libraryName = 'FragNav'
-    artifact = 'frag-nav'
-
-    libraryDescription = 'A library to help manage multiple fragment stacks'
-
-    siteUrl = 'https://github.com/ncapdevi/FragNav'
-    gitUrl = 'https://github.com/ncapdevi/FragNav.git'
-
-    developerId = 'ncapdevi'
-    developerName = 'Nic Capdevila'
-    developerEmail = 'ncapdevi@gmail.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
-
+group = "com.ncapdevi"
+version = "3.4.0"
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    namespace = 'com.ncapdevi.fragnav'
+
+    compileSdk rootProject.ext.compileSdkVersion
 
     lintOptions {
         abortOnError false
     }
+
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode libraryVersionCode
-        versionName libraryVersionName
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -58,6 +33,17 @@ android {
         }
         debug {
             testCoverageEnabled true
+        }
+    }
+
+    compileOptions {
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+    }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
         }
     }
 
@@ -78,17 +64,16 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation "androidx.fragment:fragment:1.0.0"
-    implementation "androidx.annotation:annotation:1.0.2"
+    implementation "androidx.fragment:fragment-ktx:1.6.2"
+    implementation "androidx.annotation:annotation:1.7.1"
 
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0"
-    testImplementation "org.robolectric:robolectric:4.0.2"
+    testImplementation "org.robolectric:robolectric:4.2.1"
 
     testImplementation 'org.amshove.kluent:kluent-android:1.42'
 
     // Spek
-
     testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"
     testImplementation "org.spekframework.spek2:spek-runner-junit5:$spek_version"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -99,147 +84,17 @@ dependencies {
         exclude group: 'org.junit.platform'
         exclude group: 'org.jetbrains.kotlin'
     }
-
-
 }
 
-group = publishedGroupId                               // Maven Group ID for the artifact
-
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            project {
-                packaging 'aar'
-                groupId publishedGroupId
-                artifactId artifact
-
-                // Add your description here
-                name libraryName
-                description libraryDescription
-                url siteUrl
-
-                // Set your license
-                licenses {
-                    license {
-                        name licenseName
-                        url licenseUrl
-                    }
-                }
-                developers {
-                    developer {
-                        id developerId
-                        name developerName
-                        email developerEmail
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-
-                }
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.hannta'
+                artifactId = 'frag-nav'
+                version = '3.4.0'
             }
         }
     }
-}
-
-
-version = libraryVersionName
-
-if (project.hasProperty("android")) { // Android libraries
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from android.sourceSets.main.java.srcDirs
-    }
-
-/*    task javadoc(type: Javadoc) {
-        source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    }*/
-} else { // Java libraries
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-}
-
-/*task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}*/
-
-artifacts {
-    // archives javadocJar
-    archives sourcesJar
-}
-
-// Bintray
-bintray {
-    Properties properties = new Properties()
-    if (project.rootProject.file('local.properties').exists()) {
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-        user = properties.getProperty("bintray.user")
-        key = properties.getProperty("bintray.apikey")
-
-        configurations = ['archives']
-        pkg {
-            repo = bintrayRepo
-            name = bintrayName
-            desc = libraryDescription
-            websiteUrl = siteUrl
-            vcsUrl = gitUrl
-            licenses = allLicenses
-            publish = true
-            publicDownloadNumbers = true
-            version {
-                desc = libraryDescription
-            }
-        }
-    }
-}
-
-coveralls {
-    jacocoReportPath = "${buildDir}/reports/jacoco/debug/jacoco.xml"
-}
-
-tasks.coveralls {
-    dependsOn 'jacocoTestReportDebug'
-    onlyIf { System.env.'CI' }
-}
-task createPom {
-    pom {
-        project {
-            packaging 'aar'
-
-            name project.name
-            description libraryDescription
-            url siteUrl
-            inceptionYear '2016'
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                }
-            }
-            scm {
-                connection gitUrl
-                developerConnection gitUrl
-                url siteUrl
-            }
-            developers {
-                developer {
-                    id 'ncapdevi'
-                    name 'Nic Capdevila'
-                    email 'ncapdevi@gmail.com'
-                }
-            }
-        }
-    }.writeTo("$buildDir/poms/pom-default.xml").writeTo("pom.xml")
-}
-build.dependsOn createPom
-repositories {
-    mavenCentral()
 }
