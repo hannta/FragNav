@@ -2,8 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    namespace "com.ncapdevi.sample"
+
+    compileSdk rootProject.ext.compileSdkVersion
+
     lintOptions {
         abortOnError false
     }
@@ -20,15 +22,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+    }
 }
+
 repositories {
-    jcenter()
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+    }
 }
 
 dependencies {
     implementation project(':frag-nav')
-    implementation "com.google.android.material:material:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.0.2"
+    implementation "com.google.android.material:material:1.11.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
     implementation "com.roughike:bottom-bar:2.3.1"
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
