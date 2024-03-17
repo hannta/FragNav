@@ -17,9 +17,6 @@ android {
 
     compileSdk rootProject.ext.compileSdkVersion
 
-    lintOptions {
-        abortOnError false
-    }
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -58,6 +55,9 @@ android {
                 }
             }
         }
+    }
+    lint {
+        abortOnError false
     }
 }
 
