@@ -10,7 +10,7 @@ apply plugin: 'jacoco'
 apply plugin: "de.mannodermaus.android-junit5"
 
 group = "com.ncapdevi"
-version = "3.4.0"
+version = "3.5.0"
 
 android {
     namespace = 'com.ncapdevi.fragnav'
@@ -93,7 +93,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.hannta'
                 artifactId = 'frag-nav'
-                version = '3.4.0'
+                version = '3.5.0'
             }
         }
     }
