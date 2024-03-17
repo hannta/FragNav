@@ -32,6 +32,7 @@ class BottomTabsActivity : AppCompatActivity(), BaseFragment.FragmentNavigation,
             transactionListener = this@BottomTabsActivity
             rootFragmentListener = this@BottomTabsActivity
             createEager = true
+            setMaxLifecycleOnSwitch = true
             fragNavLogger = object : FragNavLogger {
                 override fun error(message: String, throwable: Throwable) {
                     Log.e(TAG, message, throwable)
